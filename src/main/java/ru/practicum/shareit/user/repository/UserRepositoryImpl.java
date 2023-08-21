@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exceptions.UserAlreadyExistException;
 import ru.practicum.shareit.exceptions.UserIdValidationException;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -51,6 +51,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UserIdValidationException(String.format("User with id: %d not found", id)));
+
         String updatedUserEmail = updatedUser.getEmail();
 
         if (userMap.containsKey(user.getEmail()) && !updatedUserEmail.equals(user.getEmail())) {

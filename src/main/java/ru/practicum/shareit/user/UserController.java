@@ -41,13 +41,13 @@ public class UserController {
         return userService.findAllUsers();
     }
 
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public UserDto getById(@PathVariable("id") Long userId) {
         log.info("Request received to endpoint: /users getById with id={}", userId);
         return userService.findUserById(userId);
     }
 
-    @PatchMapping("/id")
+    @PatchMapping("/{id}")
     public UserDto update(@PathVariable("id") Long userId,
                           @RequestBody UserDto userDto,
                           BindingResult result) {
@@ -60,7 +60,7 @@ public class UserController {
         return userService.updateUser(userId, userDto);
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public HttpStatus delete(@PathVariable("id") Long userId) {
         log.info("Request received to endpoint: /users delete with id={}", userId);
         userService.removeUser(userId);
