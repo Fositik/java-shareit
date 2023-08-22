@@ -33,9 +33,10 @@ public class ErrorHandler {
         log.warn("Ошибка ValidationException {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.error(HttpStatus.BAD_REQUEST.toString(),ex);
+        log.error(HttpStatus.BAD_REQUEST.toString(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
