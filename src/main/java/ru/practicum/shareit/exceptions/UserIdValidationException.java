@@ -1,6 +1,6 @@
 package ru.practicum.shareit.exceptions;
 
-public class UserIdValidationException extends RuntimeException{
+public class UserIdValidationException extends RuntimeException {
     public UserIdValidationException() {
         super();
     }
