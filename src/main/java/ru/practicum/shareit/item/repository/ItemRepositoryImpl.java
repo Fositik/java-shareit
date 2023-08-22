@@ -5,6 +5,7 @@ import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.exceptions.UserIdValidationException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepository {
-    private final AtomicLong id = new AtomicLong(1L);
+    private final AtomicLong id = new AtomicLong(0L);
     private final Map<Long, Item> itemMap = new HashMap<>();
 
     @Override
@@ -47,9 +48,10 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public Item updateItem(Long id, Item item) {
         Item updatedItem = itemMap.get(id);
+
         if (!updatedItem.getOwner().equals(item.getOwner())) {
             log.warn("No access. Id = {} not found for this item!", item.getId());
-            throw new ValidationException("No access. Id not found for this item!");
+            throw new UserIdValidationException("No access. Id not found for this item!");
         }
 
         if (item.getName() != null && !item.getName().isBlank()) {
@@ -65,6 +67,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         }
 
         itemMap.put(id, updatedItem);
+
         return updatedItem;
     }
 

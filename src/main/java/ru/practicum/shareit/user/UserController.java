@@ -28,7 +28,7 @@ public class UserController {
     public UserDto create(@Valid @RequestBody UserDto userDto, BindingResult result) {
         log.info("Request received to /users create endpoint");
         if (result.hasErrors()) {
-            String errorMessage = result.getFieldError("fieldName").getDefaultMessage();
+            String errorMessage = result.getFieldError().getDefaultMessage();
             log.warn(errorMessage);
             throw new ValidationException(errorMessage);
         }

@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
-    private final AtomicLong id = new AtomicLong(1L);
+    private final AtomicLong id = new AtomicLong(0L);
     private final Map<String, User> userMap = new HashMap<>();
 
     @Override

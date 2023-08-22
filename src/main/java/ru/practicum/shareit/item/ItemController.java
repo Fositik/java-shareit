@@ -21,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @Validated
 public class ItemController {
+
     private final ItemService itemService;
 
     @PostMapping
@@ -29,7 +30,7 @@ public class ItemController {
                           BindingResult result) {
         log.info("Request received to /items create endpoint with headers {}", userId);
         if (result.hasErrors()) {
-            String errorMessage = result.getFieldError("fieldName").getDefaultMessage();
+            String errorMessage = result.getFieldError().getDefaultMessage();
             log.warn(errorMessage);
             throw new ValidationException(errorMessage);
         }
@@ -55,7 +56,7 @@ public class ItemController {
                           BindingResult result) {
         log.info("Endpoint request received: /items update with ItemId={} with headers {}", itemId, userId);
         if (result.hasErrors()) {
-            String errorMessage = result.getFieldError("fieldName").getDefaultMessage();
+            String errorMessage = result.getFieldError().getDefaultMessage();
             log.warn(errorMessage);
             throw new ValidationException(errorMessage);
         }
@@ -70,8 +71,8 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@PathVariable("text") String text){
-        log.info("Endpoint request received: items/search with text: {}",text);
+    public List<ItemDto> search(@RequestParam("text") String text) {
+        log.info("Endpoint request received: items/search with text: {}", text);
         return itemService.searchItems(text);
     }
 }
