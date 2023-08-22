@@ -1,12 +1,10 @@
 package ru.practicum.shareit.item.repository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.UserIdValidationException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 

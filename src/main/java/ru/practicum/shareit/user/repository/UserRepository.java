@@ -4,10 +4,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-/**
- * Класс описывает interface UserRepository хранение в базе данных
- */
-
 public interface UserRepository {
     User createUser(User user);
 

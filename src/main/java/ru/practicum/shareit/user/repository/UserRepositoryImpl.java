@@ -9,10 +9,6 @@ import ru.practicum.shareit.user.model.User;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Класс описывает UserRepositoryInMemory хранение в памяти
- */
-
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
@@ -61,7 +57,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (user.getName() != null && !user.getName().isBlank()) {
             updatedUser.setName(user.getName());
         }
-        if (user.getEmail() != null && !user.getEmail().isBlank()){
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
             updatedUser.setEmail(user.getEmail());
         }
         userMap.remove(updatedUserEmail);

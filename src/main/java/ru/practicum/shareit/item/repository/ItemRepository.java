@@ -10,7 +10,7 @@ public interface ItemRepository {
 
     List<Item> findAllItems(User user);
 
-     Item findItemById(Long id);
+    Item findItemById(Long id);
 
     Item updateItem(Long id, Item item);
 
