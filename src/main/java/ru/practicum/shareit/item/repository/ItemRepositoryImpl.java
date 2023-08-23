@@ -72,7 +72,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> search(String text) {
-        List<Item> searchResultList = new ArrayList<>();
         if (text.isBlank()) {
             return new ArrayList<>();
         }
