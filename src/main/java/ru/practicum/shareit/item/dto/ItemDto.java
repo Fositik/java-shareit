@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.utils.validation.Create;
-import ru.practicum.shareit.utils.validation.Update;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,10 +16,10 @@ import javax.validation.constraints.NotNull;
 public class ItemDto {
     private Long id;
 
-    @NotBlank(message = "Name cannot be empty", groups = {Create.class, Update.class})
+    @NotBlank(message = "Name cannot be empty", groups = {Create.class})
     private String name;
 
-    @NotBlank(message = "Description cannot be empty", groups = {Create.class, Update.class})
+    @NotBlank(message = "Description cannot be empty", groups = {Create.class})
     private String description;
 
     @NotNull(message = "Booking status cannot be empty", groups = {Create.class})

@@ -39,8 +39,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public UserDto update(@PathVariable("id") Long userId,
-                          @Validated(Update.class)
-                          @RequestBody UserDto userDto) {
+                          @Validated(Update.class) @RequestBody UserDto userDto) {
         log.info("Request received to endpoint: /users update with id={}", userId);
         return userService.updateUser(userId, userDto);
     }

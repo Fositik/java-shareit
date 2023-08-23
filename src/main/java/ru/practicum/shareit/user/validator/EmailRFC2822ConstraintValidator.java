@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.validator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import static ru.practicum.shareit.constants.HeaderConstants.rfc2822;
+import static ru.practicum.shareit.constants.HeaderConstants.RFC_2822;
 
 public class EmailRFC2822ConstraintValidator implements ConstraintValidator<EmailRFC2822, String> {
 
@@ -18,6 +18,6 @@ public class EmailRFC2822ConstraintValidator implements ConstraintValidator<Emai
             return true;
         }
 
-        return rfc2822.matcher(email).matches();
+        return RFC_2822.matcher(email).matches();
     }
 }

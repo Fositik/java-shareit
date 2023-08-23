@@ -42,9 +42,8 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     public ItemDto update(@RequestHeader(name = USER_ID_HEADER) Long userId,
-                          @Validated(Update.class)
                           @PathVariable("id") Long itemId,
-                          @RequestBody ItemDto itemDto) {
+                          @Validated(Update.class) @RequestBody ItemDto itemDto) {
         log.info("Endpoint request received: /items update with ItemId={} with headers {}", itemId, userId);
         return itemService.updateItem(itemId, itemDto, userId);
     }

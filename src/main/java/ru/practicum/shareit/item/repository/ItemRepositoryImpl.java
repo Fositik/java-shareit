@@ -16,14 +16,18 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepository {
     private final AtomicLong id = new AtomicLong(0L);
+    private final Map<Long, Item> itemMap = new HashMap<>();
     private final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>();
 
     @Override
     public Item createItem(Item item) {
         Long itemId = id.incrementAndGet();
         item.setId(itemId);
+        itemMap.put(itemId, item);
+
         final List<Item> items = userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
         items.add(item);
+
         return item;
     }
 
@@ -33,17 +37,14 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item findItemById(Long itemId) {
-        return userItemIndex.values().stream()
-                .flatMap(List::stream)
-                .filter(item -> item.getId().equals(itemId))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Item with id: %d not found", itemId)));
+    public Item findItemById(Long id) {
+        return Optional.ofNullable(itemMap.get(id))
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %d not found", id)));
     }
 
     @Override
-    public Item updateItem(Long itemId, Item item) {
-        Item updatedItem = findItemById(itemId);
+    public Item updateItem(Long id, Item item) {
+        Item updatedItem = findItemById(id);
 
         if (!updatedItem.getOwner().equals(item.getOwner())) {
             log.warn("No access. Id = {} not found for this item!", item.getId());
@@ -66,21 +67,25 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public void removeItem(Long itemId) {
-        userItemIndex.forEach((userId, items) -> items.removeIf(item -> item.getId().equals(itemId)));
+    public void removeItem(Long id) {
+        Item removedItem = itemMap.remove(id);
+        if (removedItem != null) {
+            List<Item> userItems = userItemIndex.get(removedItem.getOwner().getId());
+            userItems.remove(removedItem);
+        }
     }
 
     @Override
     public List<Item> search(String text) {
+        List<Item> searchResultList = new ArrayList<>();
         if (text.isBlank()) {
-            return new ArrayList<>();
+            return searchResultList;
         }
 
-        return userItemIndex.values().stream()
-                .flatMap(List::stream)
-                .filter(item -> (item.getName().toLowerCase().contains(text) ||
-                        item.getDescription().toLowerCase().contains(text)) &&
-                        item.getAvailable())
+        return itemMap.values().stream()
+                .filter(item -> item.getName().toLowerCase().contains(text) ||
+                        item.getDescription().toLowerCase().contains(text) &&
+                                item.getAvailable())
                 .collect(Collectors.toList());
     }
 }
