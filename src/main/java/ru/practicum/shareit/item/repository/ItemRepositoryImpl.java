@@ -3,15 +3,11 @@ package ru.practicum.shareit.item.repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.exceptions.UserIdValidationException;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -20,36 +16,38 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepository {
     private final AtomicLong id = new AtomicLong(0L);
-    private final Map<Long, Item> itemMap = new HashMap<>();
+    private final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>();
 
     @Override
     public Item createItem(Item item) {
         Long itemId = id.incrementAndGet();
         item.setId(itemId);
-        itemMap.put(itemId, item);
+        final List<Item> items = userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
+        items.add(item);
         return item;
     }
 
     @Override
     public List<Item> findAllItems(User user) {
-        return itemMap.values().stream().filter(item -> item.getOwner().equals(user)).collect(Collectors.toList());
+        return userItemIndex.getOrDefault(user.getId(), new ArrayList<>());
     }
 
     @Override
-    public Item findItemById(Long id) {
-        return itemMap.values().stream()
-                .filter(item -> item.getId().equals(id))
+    public Item findItemById(Long itemId) {
+        return userItemIndex.values().stream()
+                .flatMap(List::stream)
+                .filter(item -> item.getId().equals(itemId))
                 .findFirst()
-                .orElseThrow(() -> new ItemNotFoundException(String.format("User with id: %d not found", id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Item with id: %d not found", itemId)));
     }
 
     @Override
-    public Item updateItem(Long id, Item item) {
-        Item updatedItem = itemMap.get(id);
+    public Item updateItem(Long itemId, Item item) {
+        Item updatedItem = findItemById(itemId);
 
         if (!updatedItem.getOwner().equals(item.getOwner())) {
             log.warn("No access. Id = {} not found for this item!", item.getId());
-            throw new UserIdValidationException("No access. Id not found for this item!");
+            throw new EntityNotFoundException("No access. Id not found for this item!");
         }
 
         if (item.getName() != null && !item.getName().isBlank()) {
@@ -64,27 +62,26 @@ public class ItemRepositoryImpl implements ItemRepository {
             updatedItem.setAvailable(item.getAvailable());
         }
 
-        itemMap.put(id, updatedItem);
-
         return updatedItem;
     }
 
     @Override
-    public void removeItem(Long id) {
-        itemMap.remove(id);
+    public void removeItem(Long itemId) {
+        userItemIndex.forEach((userId, items) -> items.removeIf(item -> item.getId().equals(itemId)));
     }
 
     @Override
     public List<Item> search(String text) {
         List<Item> searchResultList = new ArrayList<>();
         if (text.isBlank()) {
-            return searchResultList;
+            return new ArrayList<>();
         }
 
-        return itemMap.values().stream()
-                .filter(item -> item.getName().toLowerCase().contains(text) ||
-                        item.getDescription().toLowerCase().contains(text) &&
-                                item.getAvailable())
+        return userItemIndex.values().stream()
+                .flatMap(List::stream)
+                .filter(item -> (item.getName().toLowerCase().contains(text) ||
+                        item.getDescription().toLowerCase().contains(text)) &&
+                        item.getAvailable())
                 .collect(Collectors.toList());
     }
 }

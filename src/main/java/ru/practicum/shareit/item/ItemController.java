@@ -3,42 +3,33 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.utils.validation.Create;
+import ru.practicum.shareit.utils.validation.Update;
 
-import javax.validation.Valid;
-import javax.validation.ValidationException;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
+import static ru.practicum.shareit.constants.HeaderConstants.USER_ID_HEADER;
+
 @RestController
 @RequestMapping("/items")
 @Slf4j
 @AllArgsConstructor
-@Validated
 public class ItemController {
 
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto create(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
-                          @Valid @RequestBody ItemDto itemDto,
-                          BindingResult result) {
+    public ItemDto create(@RequestHeader(name = USER_ID_HEADER) Long userId,
+                          @Validated(Create.class) @RequestBody ItemDto itemDto) {
         log.info("Request received to /items create endpoint with headers {}", userId);
-        if (result.hasErrors()) {
-            String errorMessage = result.getFieldError().getDefaultMessage();
-            log.warn(errorMessage);
-            throw new ValidationException(errorMessage);
-        }
         return itemService.createItem(itemDto, userId);
     }
 
     @GetMapping
-    public List<ItemDto> getAll(@RequestHeader(name = "X-Sharer-User-Id") Long userId) {
+    public List<ItemDto> getAll(@RequestHeader(name = USER_ID_HEADER) Long userId) {
         log.info("Endpoint request received: /items getAll with headers {}", userId);
         return itemService.findAllItems(userId);
     }
@@ -50,24 +41,19 @@ public class ItemController {
     }
 
     @PatchMapping("/{id}")
-    public ItemDto update(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
+    public ItemDto update(@RequestHeader(name = USER_ID_HEADER) Long userId,
+                          @Validated(Update.class)
                           @PathVariable("id") Long itemId,
-                          @RequestBody ItemDto itemDto,
-                          BindingResult result) {
+                          @RequestBody ItemDto itemDto) {
         log.info("Endpoint request received: /items update with ItemId={} with headers {}", itemId, userId);
-        if (result.hasErrors()) {
-            String errorMessage = result.getFieldError().getDefaultMessage();
-            log.warn(errorMessage);
-            throw new ValidationException(errorMessage);
-        }
         return itemService.updateItem(itemId, itemDto, userId);
     }
 
     @DeleteMapping("/{id}")
-    public HttpStatus delete(@PathVariable("id") Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("id") Long id) {
         log.info("Request received to endpoint: /items delete with id={}", id);
         itemService.removeItem(id);
-        return HttpStatus.OK;
     }
 
     @GetMapping("/search")

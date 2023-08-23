@@ -2,8 +2,8 @@ package ru.practicum.shareit.user.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.exceptions.UserAlreadyExistException;
-import ru.practicum.shareit.exceptions.UserIdValidationException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
@@ -38,7 +38,7 @@ public class UserRepositoryImpl implements UserRepository {
         return userMap.values().stream()
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new UserIdValidationException(String.format("User with id: %d not found", id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %d not found", id)));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class UserRepositoryImpl implements UserRepository {
         User updatedUser = userMap.values().stream()
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new UserIdValidationException(String.format("User with id: %d not found", id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %d not found", id)));
 
         String updatedUserEmail = updatedUser.getEmail();
 
@@ -70,7 +70,7 @@ public class UserRepositoryImpl implements UserRepository {
         User removedUser = userMap.values().stream()
                 .filter(u -> u.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new UserIdValidationException(String.format("User with id: %d not found", id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %d not found", id)));
         userMap.remove(removedUser.getEmail());
     }
 }
